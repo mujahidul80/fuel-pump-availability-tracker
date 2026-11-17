@@ -44,7 +44,7 @@ try {
     $sqlSettings = "CREATE TABLE IF NOT EXISTS settings (
         id INT PRIMARY KEY DEFAULT 1,
         site_name VARCHAR(255) DEFAULT 'তেল দিচ্ছে?',
-        site_desc VARCHAR(255) DEFAULT 'ঈশ্বরদী জ্বালানি তথ্য সেবা',
+        site_desc VARCHAR(255) DEFAULT 'চুয়াডাঙ্গা জ্বালানি তথ্য সেবা',
         contact_email VARCHAR(255) DEFAULT 'hello@rakibs.com.bd',
         copyright_year VARCHAR(10) DEFAULT '২০২৬',
         creator_name VARCHAR(255) DEFAULT 'মুজাহিদুল ইসলাম',

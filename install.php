@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             daily_vote_limit INT DEFAULT 5,
             daily_comment_limit INT DEFAULT 5,
             site_name VARCHAR(100) DEFAULT 'তেল দিচ্ছে?',
-            site_desc VARCHAR(255) DEFAULT 'ঈশ্বরদী জ্বালানি তথ্য সেবা',
+            site_desc VARCHAR(255) DEFAULT 'চুয়াডাঙ্গা জ্বালানি তথ্য সেবা',
             contact_email VARCHAR(100) DEFAULT '',
             copyright_year VARCHAR(20) DEFAULT '২০২৬',
             total_visits INT DEFAULT 0,

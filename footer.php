@@ -2,7 +2,7 @@
     <div class="footer-content">
         <div class="footer-left">
             <h3><?= htmlspecialchars($settings['site_name'] ?? 'তেল দিচ্ছে?') ?></h3>
-            <p><?= htmlspecialchars($settings['site_desc'] ?? 'ঈশ্বরদী জ্বালানি তথ্য সেবা') ?></p>
+            <p><?= htmlspecialchars($settings['site_desc'] ?? 'চুয়াডাঙ্গা জ্বালানি তথ্য সেবা') ?></p>
             <?php if (!empty($settings['contact_email'])): ?>
                 <p>📧 <?= htmlspecialchars($settings['contact_email']) ?></p>
             <?php endif; ?>
