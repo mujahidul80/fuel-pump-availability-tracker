@@ -20,6 +20,7 @@
             <?php if (!empty($settings['facebook_link'])): ?>
                 <a href="<?= htmlspecialchars($settings['facebook_link']) ?>" target="_blank" class="social-link">Facebook -এ যুক্ত হোন</a>
             <?php endif; ?>
+            <a href="https://wa.me/8801571432927" target="_blank" class="social-link" style="background:#25D366;color:#fff;border-color:#25D366;display:inline-flex;align-items:center;gap:6px;"><i class="fa-brands fa-whatsapp"></i> WhatsApp -এ যোগাযোগ</a>
         </div>
     </div>
     <div class="footer-bottom">
