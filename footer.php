@@ -1,0 +1,33 @@
+<footer class="site-footer">
+    <div class="footer-content">
+        <div class="footer-left">
+            <h3><?= htmlspecialchars($settings['site_name'] ?? 'তেল দিচ্ছে?') ?></h3>
+            <p><?= htmlspecialchars($settings['site_desc'] ?? 'ঈশ্বরদী জ্বালানি তথ্য সেবা') ?></p>
+            <?php if (!empty($settings['contact_email'])): ?>
+                <p>📧 <?= htmlspecialchars($settings['contact_email']) ?></p>
+            <?php endif; ?>
+        </div>
+        <div class="footer-right">
+            <?php if (!empty($settings['promo_text'])): ?>
+                <div class="promo-box">
+                    <?php if (!empty($settings['promo_link'])): ?>
+                        <a href="<?= htmlspecialchars($settings['promo_link']) ?>" target="_blank"><?= htmlspecialchars($settings['promo_text']) ?></a>
+                    <?php else: ?>
+                        <span><?= htmlspecialchars($settings['promo_text']) ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($settings['facebook_link'])): ?>
+                <a href="<?= htmlspecialchars($settings['facebook_link']) ?>" target="_blank" class="social-link">Facebook -এ যুক্ত হোন</a>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p class="copyright-text">&copy; <?= htmlspecialchars($settings['copyright_year'] ?? '২০২৬') ?> | সর্বস্বত্ব সংরক্ষিত</p>
+        <p class="powered-by">ডিজাইন ও ডেভেলপমেন্ট: <strong><?= htmlspecialchars($settings['creator_name'] ?? 'রাকিবুল ইসলাম') ?></strong></p>
+    </div>
+</footer>
+
+<script src="script.js?v=<?= time() ?>"></script>
+</body>
+</html>

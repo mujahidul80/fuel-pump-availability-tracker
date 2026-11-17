@@ -1,0 +1,22 @@
+# Uploaded pump and comment images (exclude large local media, keep uploads folder)
+uploads/*
+!uploads/.gitkeep
+
+# Sensitive credentials & environment files (uncomment if you wish to exclude db.php)
+# db.php
+
+# Temporary files & logs
+*.log
+*.tmp
+*.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
