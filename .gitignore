@@ -1,6 +1,8 @@
-# Uploaded pump and comment images (exclude large local media, keep uploads folder)
+# Uploaded pump and comment images (track webp assets, exclude large temp files)
 uploads/*
 !uploads/.gitkeep
+!uploads/*.webp
+!public/uploads/*.webp
 
 # Sensitive credentials & environment files (uncomment if you wish to exclude db.php)
 # db.php

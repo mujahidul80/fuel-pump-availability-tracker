@@ -146,23 +146,38 @@ if ($is_logged_in && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $address = trim($_POST['address']);
             $phone = trim($_POST['phone'] ?? '');
             $map_link = trim($_POST['map_link'] ?? '');
+            $image_path = trim($_POST['image_path'] ?? '');
             
             if (!empty($name) && !empty($address)) {
-                $pdo->prepare("UPDATE pumps SET name = ?, address = ?, phone = ?, map_link = ? WHERE id = ?")->execute([$name, $address, $phone, $map_link, $id]);
+                $imgVal = $image_path !== '' ? $image_path : null;
+                $pdo->prepare("UPDATE pumps SET name = ?, address = ?, phone = ?, map_link = ?, image_path = ? WHERE id = ?")->execute([$name, $address, $phone, $map_link, $imgVal, $id]);
             }
         } elseif ($_POST['action'] === 'change_pump_image') {
             $id = (int)$_POST['pump_id'];
-            if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] === UPLOAD_ERR_OK) {
+            $image_path = null;
+            
+            // ১. বাহ্যিক ইমেজ লিংক বা URL দেওয়া থাকলে
+            if (!empty($_POST['image_url'])) {
+                $urlInput = trim($_POST['image_url']);
+                if (filter_var($urlInput, FILTER_VALIDATE_URL) || strpos($urlInput, 'uploads/') === 0) {
+                    $image_path = $urlInput;
+                }
+            }
+            
+            // ২. ফাইল আপলোড করা থাকলে
+            if (!$image_path && isset($_FILES['new_image']) && $_FILES['new_image']['error'] === UPLOAD_ERR_OK) {
                 $tmpName = $_FILES['new_image']['tmp_name'];
                 $mime = mime_content_type($tmpName);
-                if (in_array($mime, ['image/jpeg', 'image/png'])) {
+                if (in_array($mime, ['image/jpeg', 'image/png', 'image/webp'])) {
                     $uploadDir = '../uploads/';
                     if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }
                     $converted = false;
-                    $image_path = null;
                     if (function_exists('imagecreatefromjpeg') && function_exists('imagewebp')) {
                         $targetPath = $uploadDir . time() . '_admin_' . uniqid() . '.webp';
-                        $img = ($mime === 'image/jpeg') ? @imagecreatefromjpeg($tmpName) : @imagecreatefrompng($tmpName);
+                        $img = null;
+                        if ($mime === 'image/jpeg') $img = @imagecreatefromjpeg($tmpName);
+                        elseif ($mime === 'image/png') $img = @imagecreatefrompng($tmpName);
+                        elseif ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) $img = @imagecreatefromwebp($tmpName);
                         if ($img) {
                             if ($mime === 'image/png') { imagepalettetotruecolor($img); imagealphablending($img, true); imagesavealpha($img, true); }
                             if (imagewebp($img, $targetPath, 80)) { $image_path = 'uploads/' . basename($targetPath); $converted = true; }
@@ -170,20 +185,23 @@ if ($is_logged_in && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                     if (!$converted) {
-                        $ext = ($mime === 'image/jpeg') ? '.jpg' : '.png';
+                        $ext = ($mime === 'image/jpeg') ? '.jpg' : (($mime === 'image/png') ? '.png' : '.webp');
                         $targetPath = $uploadDir . time() . '_admin_' . uniqid() . $ext;
                         if (move_uploaded_file($tmpName, $targetPath)) { $image_path = 'uploads/' . basename($targetPath); }
                     }
-                    if ($image_path) {
-                        // পুরনো ছবি ডিলিট করা
-                        $stmt = $pdo->prepare("SELECT image_path FROM pumps WHERE id = ?");
-                        $stmt->execute([$id]);
-                        $old_img = $stmt->fetchColumn();
-                        if ($old_img && file_exists("../" . $old_img)) { unlink("../" . $old_img); }
-                        // নতুন ছবি সেভ করা
-                        $pdo->prepare("UPDATE pumps SET image_path = ? WHERE id = ?")->execute([$image_path, $id]);
-                    }
                 }
+            }
+            
+            if ($image_path) {
+                // পুরনো লোকাল ফাইল ডিলিট করা (যদি এক্সটার্নাল URL না হয়)
+                $stmt = $pdo->prepare("SELECT image_path FROM pumps WHERE id = ?");
+                $stmt->execute([$id]);
+                $old_img = $stmt->fetchColumn();
+                if ($old_img && !preg_match('#^https?://#i', $old_img) && file_exists("../" . $old_img)) { 
+                    @unlink("../" . $old_img); 
+                }
+                // নতুন ছবি সেভ করা
+                $pdo->prepare("UPDATE pumps SET image_path = ? WHERE id = ?")->execute([$image_path, $id]);
             }
         } elseif ($_POST['action'] === 'system_update') {
             if (isset($_FILES['update_zip']) && $_FILES['update_zip']['error'] === UPLOAD_ERR_OK) {
@@ -460,9 +478,13 @@ $site_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $base_p
                         <td>
                             <div style="display: flex; gap: 16px; align-items: flex-start;">
                                 <?php if (!empty($pump['image_path'])): ?>
+                                    <?php 
+                                        $p_img = $pump['image_path'];
+                                        $p_img_url = preg_match('#^https?://#i', $p_img) ? $p_img : ($site_url . '/' . ltrim($p_img, '/'));
+                                    ?>
                                     <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
-                                    <a href="<?= $site_url ?>/<?= htmlspecialchars($pump['image_path']) ?>" target="_blank" style="margin-bottom: 0;">
-                                        <img src="<?= $site_url ?>/<?= htmlspecialchars($pump['image_path']) ?>" class="admin-img-thumb" style="margin-bottom: 0;">
+                                        <a href="<?= htmlspecialchars($p_img_url) ?>" target="_blank" style="margin-bottom: 0;">
+                                            <img src="<?= htmlspecialchars($p_img_url) ?>" class="admin-img-thumb" style="margin-bottom: 0;">
                                         </a>
                                         <form method="POST" onsubmit="return confirm('ছবিটি ডিলিট করতে চান?');" style="width: 100%;">
                                             <input type="hidden" name="action" value="delete_image">
@@ -549,6 +571,7 @@ $site_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $base_p
                                 <div><label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">ঠিকানা:</label><input type="text" name="address" value="<?= htmlspecialchars($pump['address']) ?>" required style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px;"></div>
                                 <div><label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">ফোন নম্বর:</label><input type="tel" name="phone" value="<?= htmlspecialchars($pump['phone'] ?? '') ?>" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px;"></div>
                                 <div><label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">ম্যাপ লিংক:</label><input type="url" name="map_link" value="<?= htmlspecialchars($pump['map_link'] ?? '') ?>" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px;"></div>
+                                <div style="grid-column: 1 / -1;"><label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">ছবির লিংক বা পাথ (Image Link / Path):</label><input type="text" name="image_path" value="<?= htmlspecialchars($pump['image_path'] ?? '') ?>" placeholder="uploads/pump_1.webp বা https://..." style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px;"></div>
                                 <div style="grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px;">
                                     <button type="submit" style="background: var(--text-main); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;">তথ্য সেভ করুন</button>
                                 </div>
@@ -569,9 +592,13 @@ $site_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $base_p
                             <form method="POST" enctype="multipart/form-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
                                 <input type="hidden" name="action" value="change_pump_image">
                                 <input type="hidden" name="pump_id" value="<?= $pump['id'] ?>">
-                                <div style="grid-column: 1 / -1;">
-                                    <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">নতুন ছবি আপলোড করুন:</label>
-                                    <input type="file" name="new_image" accept=".jpg, .jpeg, .png" required style="width: 100%; padding: 8px; border: 1px dashed var(--primary); border-radius: 4px; font-size: 14px; background: white; cursor: pointer;">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">অনলাইন ছবির লিংক দিন (Image URL):</label>
+                                    <input type="text" name="image_url" placeholder="https://example.com/pump.jpg" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 4px;">অথবা ফাইল আপলোড করুন (Upload Image):</label>
+                                    <input type="file" name="new_image" accept=".jpg, .jpeg, .png, .webp" style="width: 100%; padding: 6px; border: 1px dashed var(--primary); border-radius: 4px; font-size: 13px; background: white; cursor: pointer;">
                                 </div>
                                 <div style="grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px;">
                                     <button type="submit" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;">ছবি পরিবর্তন করুন</button>
@@ -598,8 +625,12 @@ $site_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $base_p
                                                         </form>
                                                     </div>
                                                     <?php if(!empty($c['image_path'])): ?>
+                                                        <?php 
+                                                            $c_img = $c['image_path'];
+                                                            $c_img_url = preg_match('#^https?://#i', $c_img) ? $c_img : ($site_url . '/' . ltrim($c_img, '/'));
+                                                        ?>
                                                         <div style="flex-shrink: 0; margin-top: 25px;">
-                                                        <a href="<?= $site_url ?>/<?= htmlspecialchars($c['image_path']) ?>" target="_blank"><img src="<?= $site_url ?>/<?= htmlspecialchars($c['image_path']) ?>" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);"></a>
+                                                            <a href="<?= htmlspecialchars($c_img_url) ?>" target="_blank"><img src="<?= htmlspecialchars($c_img_url) ?>" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);"></a>
                                                         </div>
                                                     <?php endif; ?>
                                                     <form class="delete-comment-form" method="POST" style="margin-top: 25px;">
