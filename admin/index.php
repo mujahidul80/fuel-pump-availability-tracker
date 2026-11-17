@@ -10,20 +10,33 @@ if (!file_exists($db_path)) {
 
 require_once $db_path;
 
-// সময়ের হিসাব (Time Ago) বের করার ফাংশন
+// সময়ের হিসাব (Time Ago) বের করার ফাংশন (PHP 8.2+ Deprecation Safe)
 if (!function_exists('time_elapsed_string')) {
 function time_elapsed_string($datetime, $full = false) {
-    $now = new DateTime;
-    $ago = new DateTime($datetime);
-    $diff = $now->diff($ago);
-    $diff->w = floor($diff->d / 7);
-    $diff->d -= $diff->w * 7;
-    $string = array('y' => 'বছর', 'm' => 'মাস', 'w' => 'সপ্তাহ', 'd' => 'দিন', 'h' => 'ঘণ্টা', 'i' => 'মিনিট', 's' => 'সেকেন্ড');
-    foreach ($string as $k => &$v) {
-        if ($diff->$k) { $v = $diff->$k . ' ' . $v; } else { unset($string[$k]); }
+    try {
+        $now = new DateTime('now', new DateTimeZone('Asia/Dhaka'));
+        $ago = new DateTime($datetime, new DateTimeZone('Asia/Dhaka'));
+    } catch (Exception $e) {
+        return 'কিছুক্ষণ আগে';
     }
-    if (!$full) $string = array_slice($string, 0, 1);
-    return $string ? implode(', ', $string) . ' আগে' : 'এইমাত্র';
+    $diff = $now->diff($ago);
+    $weeks = (int)floor($diff->d / 7);
+    $days = $diff->d - ($weeks * 7);
+
+    $string = [
+        'y' => $diff->y ? $diff->y . ' বছর' : '',
+        'm' => $diff->m ? $diff->m . ' মাস' : '',
+        'w' => $weeks ? $weeks . ' সপ্তাহ' : '',
+        'd' => $days ? $days . ' দিন' : '',
+        'h' => $diff->h ? $diff->h . ' ঘণ্টা' : '',
+        'i' => $diff->i ? $diff->i . ' মিনিট' : '',
+        's' => $diff->s ? $diff->s . ' সেকেন্ড' : '',
+    ];
+    $string = array_filter($string);
+    if (!$full) {
+        $string = array_slice($string, 0, 1);
+    }
+    return !empty($string) ? reset($string) . ' আগে' : 'এইমাত্র';
 }
 }
 

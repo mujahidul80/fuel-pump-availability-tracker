@@ -29,7 +29,7 @@ if (!$pdo) {
     try {
         $isVercel = getenv('VERCEL') || !empty($_SERVER['VERCEL']);
         $sqliteDir = $isVercel ? '/tmp' : __DIR__;
-        $sqliteFile = $sqliteDir . '/fuel_update_chuadanga_v3.sqlite';
+        $sqliteFile = $sqliteDir . '/fuel_chuadanga_prod.sqlite';
 
         $pdo = new PDO("sqlite:" . $sqliteFile);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
