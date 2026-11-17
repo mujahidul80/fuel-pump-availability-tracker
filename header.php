@@ -6,10 +6,15 @@ $site_desc = htmlspecialchars($settings['site_desc'] ?? 'কোথায় তে�
 $page_title = isset($pump) ? htmlspecialchars($pump['name']) . " - " . $site_title : $site_title . " - জ্বালানি তথ্য সেবা";
 $page_desc = isset($pump) ? htmlspecialchars($pump['address']) . " এর বর্তমান তেলের অবস্থা জানুন এবং আপনার মতামত দিন।" : $site_desc;
 
-// সোশ্যাল মিডিয়ায় শেয়ার করার জন্য ডাইনামিক ইমেজের ফুল লিংক (Absolute URL) তৈরি করা
-$base_url = "http" . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "s" : "") . "://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
+// সোশ্যাল মিডিয়ায় শেয়ার করার জন্য ডাইনামিক ইমেজের ফুল লিংক (Absolute URL) তৈরি করা (HTTPS Proxy Aware)
+$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+$protocol = $is_https ? "https" : "http";
+
+$base_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . dirname($_SERVER['PHP_SELF'] ?? '');
 $base_url = rtrim($base_url, '/\\');
-$current_url = "http" . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "s" : "") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$current_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . ($_SERVER['REQUEST_URI'] ?? '/');
 
 $og_image_url = isset($pump) && !empty($pump['image_path']) ? $base_url . '/' . htmlspecialchars($pump['image_path']) : $base_url . '/og-image.jpg';
 ?>

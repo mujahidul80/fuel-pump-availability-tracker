@@ -215,7 +215,7 @@ require_once 'header.php';
     <div class="details-card">
         <?php if (!empty($pump['image_path'])): ?>
             <div class="details-image-wrapper">
-                <img src="<?= htmlspecialchars($pump['image_path']) ?>" alt="Pump" class="pump-thumb">
+                <img src="<?= htmlspecialchars($pump['image_path']) ?>" alt="Pump" class="pump-thumb" onerror="this.parentElement.style.display='none';">
             </div>
         <?php endif; ?>
 

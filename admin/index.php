@@ -2,12 +2,13 @@
 session_start();
 
 // ইনস্টল করা না থাকলে ইনস্টল পেজে নিয়ে যাবে
-if (!file_exists('../db.php')) {
+$db_path = file_exists(__DIR__ . '/../db.php') ? __DIR__ . '/../db.php' : (file_exists('db.php') ? 'db.php' : '../db.php');
+if (!file_exists($db_path)) {
     header("Location: ../install.php");
     exit;
 }
 
-require_once '../db.php';
+require_once $db_path;
 
 // সময়ের হিসাব (Time Ago) বের করার ফাংশন
 if (!function_exists('time_elapsed_string')) {
@@ -221,11 +222,17 @@ if ($is_logged_in) {
     }
 }
 
-// ডাইনামিক বেস URL তৈরি (যাতে লাইভ সার্ভারে সাব-ফোল্ডার বা রাউটিং এর কারণে CSS বা ছবির পাথ ব্রেক না করে)
-$script_dir = dirname($_SERVER['SCRIPT_NAME']);
+// ডাইনামিক বেস URL ও প্রটোকল ডিটেকশন (HTTPS / Reverse Proxy / Vercel সাপোর্টেড)
+$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+$protocol = $is_https ? "https" : "http";
+
+$script_dir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
 $base_path = dirname($script_dir);
-if ($base_path === '\\' || $base_path === '/') { $base_path = ''; }
-$site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $base_path;
+if ($base_path === '\\' || $base_path === '/' || $base_path === '.') { $base_path = ''; }
+$site_root = $base_path;
+$site_url = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $base_path;
 ?>
 <!DOCTYPE html>
 <html lang="bn">
@@ -233,11 +240,117 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>অ্যাডমিন প্যানেল - তেল দিচ্ছে?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?= $site_url ?>/style.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $site_root ?>/style.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../style.css?v=<?= time() ?>">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --success-bg: #dcfce7;
+            --success-text: #15803d;
+            --danger: #f43f5e;
+            --danger-bg: #ffe4e6;
+            --danger-text: #e11d48;
+            --warning: #f59e0b;
+            --warning-bg: #fef3c7;
+            --warning-text: #b45309;
+            --bg-color: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 8px 25px rgba(0,0,0,0.04);
+            --shadow-hover: 0 15px 35px rgba(0,0,0,0.08);
+            --font-family: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-icon {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        .navbar h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+        .navbar p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-submit:hover {
+            background: var(--primary-dark);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+        }
         .admin-container { max-width: 1000px; margin: 30px auto; padding: 0 16px; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .admin-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-md); border: 1px solid var(--border); }
