@@ -9,41 +9,21 @@
     }
   },
   "routes": [
-    {
-      "src": "/admin/(.*)",
-      "dest": "/admin/index.php"
-    },
-    {
-      "src": "/admin",
-      "dest": "/admin/index.php"
-    },
-    {
-      "src": "/style.css",
-      "dest": "/style.css"
-    },
-    {
-      "src": "/script.js",
-      "dest": "/script.js"
-    },
-    {
-      "src": "/uploads/(.*)",
-      "dest": "/uploads/$1"
-    },
-    {
-      "src": "/details",
-      "dest": "/details.php"
-    },
-    {
-      "src": "/install",
-      "dest": "/install.php"
-    },
-    {
-      "src": "/setup",
-      "dest": "/setup.php"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.php"
-    }
+    { "src": "/admin/(.*)", "dest": "/admin/index.php" },
+    { "src": "/admin", "dest": "/admin/index.php" },
+    { "src": "/style\\.css", "dest": "/style.css" },
+    { "src": "/script\\.js", "dest": "/script.js" },
+    { "src": "/robots\\.txt", "dest": "/robots.txt" },
+    { "src": "/sitemap\\.xml", "dest": "/sitemap.php" },
+    { "src": "/sitemap\\.php", "dest": "/sitemap.php" },
+    { "src": "/details\\.php", "dest": "/details.php" },
+    { "src": "/details", "dest": "/details.php" },
+    { "src": "/install\\.php", "dest": "/install.php" },
+    { "src": "/install", "dest": "/install.php" },
+    { "src": "/setup\\.php", "dest": "/setup.php" },
+    { "src": "/setup", "dest": "/setup.php" },
+    { "src": "/uploads/(.*)", "dest": "/uploads/$1" },
+    { "src": "/index\\.php", "dest": "/index.php" },
+    { "src": "/", "dest": "/index.php" }
   ]
 }

@@ -9,6 +9,8 @@ uploads/*
 *.log
 *.tmp
 *.bak
+*.sqlite
+*.db
 
 # OS generated files
 .DS_Store
