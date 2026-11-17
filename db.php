@@ -1,14 +1,15 @@
 <?php
 date_default_timezone_set('Asia/Dhaka'); // বাংলাদেশের রিয়েল টাইম সেট করা হলো
 
-$host = 'localhost';
-$dbname = 'fuel_update';
-$username = 'root';
-$password = '';
-$admin_password = 'admin'; // অ্যাডমিন প্যানেলের পাসওয়ার্ড
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'fuel_update';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
+$port = getenv('DB_PORT') ?: '3306';
+$admin_password = getenv('ADMIN_PASS') ?: 'admin'; // অ্যাডমিন প্যানেলের পাসওয়ার্ড
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("❌ ডেটাবেস কানেকশন ব্যর্থ হয়েছে। দয়া করে setup.php ফাইলটি আগে রান করুন। Error: " . $e->getMessage());
