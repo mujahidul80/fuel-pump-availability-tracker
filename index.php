@@ -20,6 +20,7 @@ if (!isset($_SESSION['site_visited'])) {
 }
 
 // সময়ের হিসাব (Time Ago) বের করার ফাংশন
+if (!function_exists('time_elapsed_string')) {
 function time_elapsed_string($datetime, $full = false) {
     $now = new DateTime;
     $ago = new DateTime($datetime);
@@ -32,6 +33,7 @@ function time_elapsed_string($datetime, $full = false) {
     }
     if (!$full) $string = array_slice($string, 0, 1);
     return $string ? implode(', ', $string) . ' আগে' : 'এইমাত্র';
+}
 }
 
 // সেটিংস ফেচ করা হচ্ছে (ফুটার ও অন্যান্য কাজের জন্য)

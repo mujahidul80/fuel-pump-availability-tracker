@@ -12,6 +12,7 @@ require_once 'db.php';
 $user_ip = $_SERVER['REMOTE_ADDR'];
 
 // সময়ের হিসাব (Time Ago) বের করার ফাংশন
+if (!function_exists('time_elapsed_string')) {
 function time_elapsed_string($datetime, $full = false) {
     $now = new DateTime;
     $ago = new DateTime($datetime);
@@ -24,6 +25,7 @@ function time_elapsed_string($datetime, $full = false) {
     }
     if (!$full) $string = array_slice($string, 0, 1);
     return $string ? implode(', ', $string) . ' আগে' : 'এইমাত্র';
+}
 }
 
 // আইডি না থাকলে হোমপেজে পাঠিয়ে দেবে

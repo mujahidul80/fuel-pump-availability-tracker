@@ -10,6 +10,7 @@ if (!file_exists('../db.php')) {
 require_once '../db.php';
 
 // সময়ের হিসাব (Time Ago) বের করার ফাংশন
+if (!function_exists('time_elapsed_string')) {
 function time_elapsed_string($datetime, $full = false) {
     $now = new DateTime;
     $ago = new DateTime($datetime);
@@ -22,6 +23,7 @@ function time_elapsed_string($datetime, $full = false) {
     }
     if (!$full) $string = array_slice($string, 0, 1);
     return $string ? implode(', ', $string) . ' আগে' : 'এইমাত্র';
+}
 }
 
 // লগইন পাসওয়ার্ড এখন db.php থেকে স্বয়ংক্রিয়ভাবে আসবে
