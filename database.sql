@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
     `site_desc` VARCHAR(255) DEFAULT 'কোথায় তেল পাওয়া যাচ্ছে জানুন - জ্বালানি তথ্য সেবা',
     `contact_email` VARCHAR(255) DEFAULT 'hello@example.com',
     `copyright_year` VARCHAR(20) DEFAULT '২০২৬',
-    `creator_name` VARCHAR(255) DEFAULT 'অ্যাডমিন',
+    `creator_name` VARCHAR(255) DEFAULT 'মুজাহিদুল ইসলাম',
     `facebook_link` VARCHAR(255) DEFAULT '',
     `promo_text` TEXT NULL,
     `promo_link` VARCHAR(255) NULL,

@@ -105,6 +105,15 @@ http://localhost/fuel-pump-availability-tracker/admin/
 
 ---
 
+## 👨‍💻 Author & Copyright
+
+- **Developed By:** [Mujahidul Islam](https://github.com/mujahidul80)
+- **GitHub:** [@mujahidul80](https://github.com/mujahidul80)
+- **Copyright:** &copy; 2026 Mujahidul Islam. All Rights Reserved.
+
+---
+
 ## 📄 License
 
-This project is licensed under the open-source MIT License.
+This project is open-source and available under the [MIT License](LICENSE).
+Copyright (c) 2026 Mujahidul Islam.

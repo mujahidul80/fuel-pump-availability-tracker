@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             contact_email VARCHAR(100) DEFAULT '',
             copyright_year VARCHAR(20) DEFAULT '২০২৬',
             total_visits INT DEFAULT 0,
-            creator_name VARCHAR(100) DEFAULT 'অ্যাডমিন',
+            creator_name VARCHAR(100) DEFAULT 'মুজাহিদুল ইসলাম',
             facebook_link VARCHAR(255) DEFAULT '',
             promo_text VARCHAR(255) DEFAULT '',
             promo_link VARCHAR(255) DEFAULT ''

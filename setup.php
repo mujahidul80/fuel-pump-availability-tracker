@@ -47,7 +47,7 @@ try {
         site_desc VARCHAR(255) DEFAULT 'ঈশ্বরদী জ্বালানি তথ্য সেবা',
         contact_email VARCHAR(255) DEFAULT 'hello@rakibs.com.bd',
         copyright_year VARCHAR(10) DEFAULT '২০২৬',
-        creator_name VARCHAR(255) DEFAULT 'রাকিবুল ইসলাম',
+        creator_name VARCHAR(255) DEFAULT 'মুজাহিদুল ইসলাম',
         facebook_link VARCHAR(255) DEFAULT '',
         promo_text TEXT NULL,
         promo_link VARCHAR(255) NULL,

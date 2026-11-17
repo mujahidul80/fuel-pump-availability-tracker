@@ -23,8 +23,8 @@
         </div>
     </div>
     <div class="footer-bottom">
-        <p class="copyright-text">&copy; <?= htmlspecialchars($settings['copyright_year'] ?? '২০২৬') ?> | সর্বস্বত্ব সংরক্ষিত</p>
-        <p class="powered-by">ডিজাইন ও ডেভেলপমেন্ট: <strong><?= htmlspecialchars($settings['creator_name'] ?? 'রাকিবুল ইসলাম') ?></strong></p>
+        <p class="copyright-text">&copy; <?= htmlspecialchars($settings['copyright_year'] ?? '২০২৬') ?> <?= htmlspecialchars($settings['creator_name'] ?? 'মুজাহিদুল ইসলাম') ?> | সর্বস্বত্ব সংরক্ষিত</p>
+        <p class="powered-by">ডিজাইন ও ডেভেলপমেন্ট: <strong><?= htmlspecialchars($settings['creator_name'] ?? 'মুজাহিদুল ইসলাম') ?></strong></p>
     </div>
 </footer>
 
